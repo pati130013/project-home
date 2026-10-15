@@ -162,19 +162,21 @@ function viewPeople() {
 }
 
 function viewBudget() {
-  const items = budget.filter((b) => !$("#fRoom").value || b.room === $("#fRoom").value);
-  const total = budget.reduce((s, b) => s + (+b.amount || 0), 0);
-  const paid = budget.filter((b) => b.paid).reduce((s, b) => s + (+b.amount || 0), 0);
-  const shown = items.reduce((s, b) => s + (+b.amount || 0), 0);
+  // koszt zadania wchodzi do budżetu automatycznie – chyba że zadanie ma już własną pozycję budżetową
   const linked = new Set(budget.map((b) => b.task_id).filter(Boolean));
-  const loose = tasks.filter((t) => t.cost && !linked.has(t.id) && (!$("#fRoom").value || t.room === $("#fRoom").value));
-  const looseSum = loose.reduce((s, t) => s + +t.cost, 0);
+  const fromTasks = tasks.filter((t) => +t.cost > 0 && !linked.has(t.id))
+    .map((t) => ({ id: t.id, title: t.title, amount: t.cost, room: t.room, paid: t.cost_paid, fromTask: t }));
+  const all = [...budget, ...fromTasks];
+  const items = all.filter((b) => !$("#fRoom").value || b.room === $("#fRoom").value);
+  const total = all.reduce((s, b) => s + (+b.amount || 0), 0);
+  const paid = all.filter((b) => b.paid).reduce((s, b) => s + (+b.amount || 0), 0);
+  const shown = items.reduce((s, b) => s + (+b.amount || 0), 0);
   const rows = items.map((b) => {
-    const t = tasks.find((x) => x.id === b.task_id);
-    return `<div class="bitem ${b.paid ? "paid" : ""}" data-budget="${b.id}">
+    const t = b.fromTask || tasks.find((x) => x.id === b.task_id);
+    return `<div class="bitem ${b.paid ? "paid" : ""}" ${b.fromTask ? `data-tcost="${b.id}"` : `data-budget="${b.id}"`}>
       <div><b>${esc(b.title)}</b><br>
       ${b.room ? `<span class="tag">${ico(b.room)}${esc(b.room)}</span>` : ""}
-      ${t ? `<span class="tag p${C.PEOPLE.indexOf(t.assignee)}">Task: ${esc(t.title)}</span>` : ""}
+      ${t ? `<span class="tag p${C.PEOPLE.indexOf(t.assignee)}">${b.fromTask ? "From task" : "Task: " + esc(t.title)}</span>` : ""}
       ${b.paid ? `<span class="tag">Paid</span>` : ""}
       ${b.note ? `<div class="small">${esc(b.note)}</div>` : ""}</div>
       <span class="amt">${money(b.amount)}</span></div>`;
@@ -187,8 +189,7 @@ function viewBudget() {
     <div class="card left"><span class="small">Left after budget</span><b class="${funds - total < 0 ? "neg" : ""}">${money(funds - total)}</b></div>
     <div class="card paid"><span class="small">Cash left now</span><b class="${funds - paid < 0 ? "neg" : ""}">${money(funds - paid)}</b></div></div>
     ${$("#fRoom").value ? `<p class="small">Showing ${esc($("#fRoom").value)}: ${money(shown)}</p>` : ""}
-    ${loose.length ? `<p class="small">Not in budget yet: ${loose.length} task(s) with a cost, ${money(looseSum)} in total.</p>` : ""}
-    ${rows || `<p class="small">No budget items yet – add the first one with the button above.</p>`}`;
+    ${rows || `<p class="small">No budget items yet – add one with the + button, or give a task a cost.</p>`}`;
 }
 
 function render() {
@@ -204,6 +205,7 @@ $("#view").onclick = (e) => {
   if (e.target.closest("[data-ext]") || e.target.matches("select")) return;
   const r = e.target.closest("[data-room]"); if (r) { curRoom = r.dataset.room; return render(); }
   const t = e.target.closest(".task"); if (t) return openTask(tasks.find((x) => x.id === t.dataset.id));
+  const tc = e.target.closest("[data-tcost]"); if (tc) return openTask(tasks.find((x) => x.id === tc.dataset.tcost));
   const b = e.target.closest("[data-budget]"); if (b) return openBudget(budget.find((x) => x.id === b.dataset.budget));
   const l = e.target.closest("[data-link]"); if (l) return openLink(links.find((x) => x.id === l.dataset.link));
 };
@@ -258,6 +260,7 @@ function formData(f) {
   for (const k of ["due", "cost", "amount", "task_id", "room"]) if (k in o && !o[k]) o[k] = null;
   for (const k of ["cost", "amount"]) if (o[k] != null) o[k] = Number(o[k]);
   if (f.paid) o.paid = f.paid.checked;
+  if (f.cost_paid) o.cost_paid = f.cost_paid.checked;
   if (f.id === "taskForm") { o.depends_on = [...f.querySelectorAll("[name=dep]:checked")].map((c) => c.value); delete o.dep; }
   return o;
 }

@@ -8,6 +8,7 @@ create table tasks (
   status text not null default 'todo',
   due date,
   cost numeric,
+  cost_paid boolean not null default false,
   depends_on uuid[] not null default '{}',
   notes text,
   created_at timestamptz default now()
