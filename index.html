@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2f6f5e">
+<title>Project Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=18">
+</head>
+<body>
+
+<section id="login" hidden>
+  <form id="loginForm" class="card login">
+    <h1><span class="ico" style="--i:url(icons/dom.png)"></span> Project Home</h1>
+    <input name="email" type="email" placeholder="Email" required autocomplete="username">
+    <input name="password" type="password" placeholder="Password" required autocomplete="current-password">
+    <button class="primary">Log in</button>
+    <p id="loginErr" class="err"></p>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header>
+    <h1><span class="ico" style="--i:url(icons/dom.png)"></span> Project Home</h1>
+    <nav id="tabs">
+      <button data-tab="kanban" class="active">Kanban</button>
+      <button data-tab="rooms">Rooms</button>
+      <button data-tab="people">People</button>
+      <button data-tab="budget">Budget</button>
+    </nav>
+    <div class="pop" id="filterPop">
+      <button class="iconbtn" id="filterBtn" title="Filter" aria-label="Filter"><span class="ico" style="--i:url(icons/filter.png)"></span></button>
+      <div class="menu">
+        <label class="small">Room</label><select id="fRoom"></select>
+        <label class="small">Person</label><select id="fPerson"></select>
+        <button class="ghost" id="clearFilter" type="button">Clear filters</button>
+      </div>
+    </div>
+    <div class="pop" id="addPop">
+      <button class="iconbtn solid" id="addBtn" title="Add" aria-label="Add"><span class="ico" style="--i:url(icons/plus.png)"></span></button>
+      <div class="menu">
+        <button id="addTask" data-closes>Task</button>
+        <button id="addLink" data-closes>Link / Inspo</button>
+        <button id="addBudget" data-closes>Budget item</button>
+      </div>
+    </div>
+    <span id="mode" class="badge"></span>
+    <button id="logout" class="ghost" hidden>Log out</button>
+  </header>
+
+  <main id="view"></main>
+</div>
+
+<dialog id="taskDlg">
+  <form method="dialog" id="taskForm">
+    <h2>Task</h2>
+    <input name="title" placeholder="What needs to be done?" required>
+    <div class="row">
+      <select name="room"></select>
+      <select name="assignee"></select>
+    </div>
+    <div class="row">
+      <select name="status"></select>
+      <input name="due" type="date">
+    </div>
+    <input name="cost" type="number" min="0" step="0.01" placeholder="Cost">
+    <label class="small">Must be done first (optional)</label>
+    <div id="deps" class="deps"></div>
+    <textarea name="notes" rows="3" placeholder="Notes, contractor…"></textarea>
+    <div class="row end">
+      <button type="button" id="taskDel" class="danger" title="Delete" aria-label="Delete"><span class="ico" style="--i:url(icons/trash.png)"></span></button>
+      <button type="button" class="ghost" data-close>Cancel</button>
+      <button class="primary save" title="Save" aria-label="Save"><span class="ico" style="--i:url(icons/save.png)"></span></button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="linkDlg">
+  <form method="dialog" id="linkForm">
+    <h2>Link / Inspo</h2>
+    <input name="title" placeholder="Title (e.g. Bathroom tiles)" required>
+    <input name="url" type="url" placeholder="Page URL (https://…)">
+    <input name="image" type="url" placeholder="Image URL (optional)">
+    <select name="room"></select>
+    <textarea name="note" rows="3" placeholder="Note, price, shop…"></textarea>
+    <div class="row end">
+      <button type="button" id="linkDel" class="danger" title="Delete" aria-label="Delete"><span class="ico" style="--i:url(icons/trash.png)"></span></button>
+      <button type="button" class="ghost" data-close>Cancel</button>
+      <button class="primary save" title="Save" aria-label="Save"><span class="ico" style="--i:url(icons/save.png)"></span></button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="budgetDlg">
+  <form method="dialog" id="budgetForm">
+    <h2>Budget item</h2>
+    <input name="title" placeholder="What is it? (e.g. Kitchen cabinets)" required>
+    <div class="row">
+      <input name="amount" type="number" min="0" step="0.01" placeholder="Amount">
+      <select name="room"></select>
+    </div>
+    <label class="small">Linked task (optional)</label>
+    <select name="task_id"></select>
+    <label class="check"><input name="paid" type="checkbox"> Paid</label>
+    <textarea name="note" rows="3" placeholder="Note, shop, invoice…"></textarea>
+    <div class="row end">
+      <button type="button" id="budgetDel" class="danger" title="Delete" aria-label="Delete"><span class="ico" style="--i:url(icons/trash.png)"></span></button>
+      <button type="button" class="ghost" data-close>Cancel</button>
+      <button class="primary save" title="Save" aria-label="Save"><span class="ico" style="--i:url(icons/save.png)"></span></button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="askDlg">
+  <form method="dialog">
+    <p id="askMsg"></p>
+    <div class="row end">
+      <button type="button" class="ghost" data-close>No</button>
+      <button class="primary" value="yes">Yes</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js?v=18"></script>
+<script src="app.js?v=18"></script>
+</body>
+</html>
