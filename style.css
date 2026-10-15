@@ -134,4 +134,4 @@ dialog h2{margin:0}
 .ghost[data-close]:hover{background:var(--terracotta);border-color:var(--terracotta)}
 #askDlg{width:min(340px,92vw)}
 #askMsg{margin:0 0 4px}
-.cnt{font-size:11px;font-weight:800;line-height:1;margin-left:2px;padding:1px 5px;border-radius:8px;background:var(--terracotta);color:var(--text-on-accent);vertical-align:super}
+.cnt{font-size:10px;font-weight:700;line-height:1;margin-left:1px;vertical-align:super;color:inherit}
