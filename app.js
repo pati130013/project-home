@@ -143,7 +143,11 @@ function viewRooms() {
   const rt = tasks.filter((t) => t.room === curRoom);
   const rl = links.filter((l) => l.room === curRoom);
   const open = rt.filter((t) => t.status !== "done").length;
-  return `<div class="chips">${C.ROOMS.map((r) => `<button data-room="${esc(r)}" class="${r === curRoom ? "active" : ""}" title="${esc(r)}" aria-label="${esc(r)}">${ico(r)}${r === curRoom || !ico(r) ? `${esc(r)} <span class="small">${tasks.filter((t) => t.room === r && t.status !== "done").length || ""}</span>` : ""}</button>`).join("")}</div>
+  const openIn = (r) => tasks.filter((t) => t.room === r && t.status !== "done").length;
+  return `<div class="chips">${C.ROOMS.map((r) => {
+    const expanded = r === curRoom || !ico(r), n = openIn(r);
+    return `<button data-room="${esc(r)}" class="${r === curRoom ? "active" : ""}" title="${esc(r)}" aria-label="${esc(r)}">${ico(r)}${expanded ? esc(r) : n ? `<sup class="cnt">${n}</sup>` : ""}</button>`;
+  }).join("")}</div>
   <h2>Inspo & links (${rl.length})</h2>
   <div class="grid">${rl.map(linkCard).join("") || `<p class="small">No links yet – add the first one with the button above.</p>`}</div>
   <h2>Tasks – ${esc(curRoom)} (open: ${open})</h2>
